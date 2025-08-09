@@ -1,0 +1,1142 @@
+<!doctype html>
+<html lang="it" data-theme="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ChillQuizList — Redesigned</title>
+    <meta name="description"
+        content="Collezione elegante e interattiva di mini-quiz quotidiani. Badge, progress tracker, livelli, e animazioni." />
+
+    <!-- Google font (optional) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ---------- Root & Themes ---------- */
+        :root {
+            --bg: #f6f8fb;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --text: #0b1220;
+            --accent: #5e17eb;
+            --accent-2: #7c5cff;
+            --glass: rgba(255, 255, 255, 0.6);
+            --shadow: 0 6px 18px rgba(20, 20, 40, 0.08);
+            --green: #22c55e;
+            --green-dark: #16a34a;
+        }
+
+        [data-theme='dark'] {
+            --bg: #0f1115;
+            --card: #111215;
+            --muted: #9aa0a6;
+            --text: #ffffff;
+            --accent: #8a5cff;
+            --accent-2: #5e17eb;
+            --glass: rgba(255, 255, 255, 0.04);
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            --green: #22c55e;
+            --green-dark: #16a34a;
+        }
+
+        /* Reset */
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            background: linear-gradient(180deg, var(--bg), #eef2f9);
+            color: var(--text);
+            margin: 0;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        [data-theme='dark'] body {
+            background: linear-gradient(180deg, var(--bg), #0a0c10);
+        }
+
+        /* Container */
+        .wrap {
+            max-width: 1100px;
+            margin: 48px auto;
+            padding: 20px;
+        }
+
+        /* ---------- NAVBAR ---------- */
+        header.nav {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 12px;
+            width: calc(100% - 40px);
+            max-width: 1100px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.35));
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: var(--shadow);
+            z-index: 999;
+        }
+
+        [data-theme='dark'] header.nav {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 6px 18px rgba(92, 23, 235, 0.18)
+        }
+
+        .brand h1 {
+            font-size: 1.05rem;
+            margin: 0;
+            color: var(--text);
+        }
+
+        nav.primary {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-left: 8px
+        }
+
+        nav.primary a {
+            padding: 8px 12px;
+            border-radius: 10px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.94rem;
+            transition: all .28s cubic-bezier(.2, .9, .25, 1)
+        }
+
+        nav.primary a.active,
+        nav.primary a:hover {
+            color: var(--accent-2);
+            transform: translateY(-2px);
+        }
+
+        /* Controls to the right */
+        .controls {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .theme-toggle {
+            width: 52px;
+            height: 30px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, #fff, #f2f4f9);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 4px 10px rgba(25, 25, 60, 0.06)
+        }
+
+        .theme-toggle .knob {
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: white;
+            box-shadow: 0 6px 14px rgba(20, 20, 40, 0.12);
+            transform: translateX(0);
+            transition: transform .32s cubic-bezier(.2, .9, .25, 1)
+        }
+
+        [data-theme='dark'] .theme-toggle {
+            background: linear-gradient(180deg, #121316, #0b0b0d)
+        }
+
+        [data-theme='dark'] .theme-toggle .knob {
+            transform: translateX(22px)
+        }
+
+        /* Compact progress pill */
+        .progress-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px;
+            background: var(--card);
+            border-radius: 999px;
+            box-shadow: var(--shadow);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .progress-pill small {
+            color: var(--muted);
+            font-weight: 500
+        }
+
+        /* ---------- HERO ---------- */
+        .hero {
+            margin-top: 86px;
+            padding: 28px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, var(--card), var(--glass));
+            box-shadow: var(--shadow);
+            display: flex;
+            gap: 20px;
+            align-items: center
+        }
+
+        .hero .left {
+            flex: 1
+        }
+
+        .hero h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.5rem;
+            color: var(--text);
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--muted)
+        }
+
+        .hero .cta {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px
+        }
+
+        .btn {
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            transition: transform .18s ease, box-shadow .18s ease;
+            color: var(--text);
+        }
+
+        .btn.primary {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: white;
+            box-shadow: 0 10px 30px rgba(92, 23, 235, 0.18)
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            color: var(--text);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ---------- GRID of categories ---------- */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+            margin-top: 18px
+        }
+
+        @media(min-width:820px) {
+            .grid {
+                grid-template-columns: repeat(3, 1fr)
+            }
+        }
+
+        .category {
+            background: var(--card);
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column
+        }
+
+        .category h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .filter-btn {
+            background: var(--card);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            padding: 6px 8px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* ---------- Card quiz ---------- */
+        .quiz-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .quiz-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 10px;
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.02));
+            border: 1px solid rgba(128, 128, 128, 0.1);
+            transition: transform .22s cubic-bezier(.2, .9, .25, 1), box-shadow .22s;
+            cursor: pointer;
+        }
+
+        .quiz-card:focus-within,
+        .quiz-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(10, 10, 30, 0.06)
+        }
+
+        .quiz-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .quiz-thumb {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            min-width: 46px;
+            overflow: hidden;
+        }
+
+        .quiz-thumb img {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .quiz-thumb .fallback-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .quiz-title {
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .quiz-sub {
+            font-size: 0.9rem;
+            color: var(--muted)
+        }
+
+        .tags {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 6px 8px;
+            border-radius: 999px;
+            font-weight: 700
+        }
+
+        .tag.easy {
+            background: rgba(34, 197, 94, 0.12);
+            color: #16a34a
+        }
+
+        .tag.medium {
+            background: rgba(245, 158, 11, 0.12);
+            color: #d97706
+        }
+
+        .tag.hard {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 8px;
+            align-items: center
+        }
+
+        .icon-btn {
+            background: var(--card);
+            border: 1px solid rgba(128, 128, 128, 0.2);
+            padding: 8px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .icon-btn.play {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: white;
+            border: none
+        }
+
+        /* Green checkmark style for completed quizzes */
+        .icon-btn.completed {
+            background: linear-gradient(90deg, var(--green), var(--green-dark));
+            color: white;
+            border: none;
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.18);
+        }
+
+        .icon-btn.completed:hover {
+            background: linear-gradient(90deg, var(--green-dark), var(--green));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.25);
+        }
+
+        /* Completed state */
+        .completed .quiz-thumb {
+            filter: grayscale(0.3) brightness(0.9)
+        }
+
+        .completed .quiz-title {
+            opacity: 0.6;
+            text-decoration: line-through
+        }
+
+        /* badges */
+        .badges {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #fff, rgba(255, 255, 255, 0.6));
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+            font-weight: 700;
+            color: var(--text);
+            transition: all 0.3s ease;
+        }
+
+        [data-theme='dark'] .badge {
+            background: linear-gradient(90deg, var(--card), rgba(255, 255, 255, 0.1));
+        }
+
+        /* modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .22s
+        }
+
+        .modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        .modal {
+            width: min(720px, 92%);
+            background: var(--card);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 30px 80px rgba(2, 6, 23, 0.4);
+            color: var(--text);
+        }
+
+        .modal h3 {
+            margin: 0 0 10px 0;
+            color: var(--text);
+        }
+
+        .modal p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        /* footer */
+        footer.site {
+            margin: 26px 0 80px 0;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        /* small helpers */
+        .muted {
+            color: var(--muted)
+        }
+
+        /* motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important
+            }
+        }
+
+        /* responsive tweaks */
+        @media(max-width:520px) {
+            header.nav {
+                left: 12px;
+                right: 12px;
+                width: calc(100% - 24px);
+                transform: none;
+                padding: 8px
+            }
+
+            .hero {
+                flex-direction: column;
+                gap: 12px
+            }
+
+            .brand h1 {
+                font-size: 0.98rem
+            }
+
+            .grid {
+                grid-template-columns: 1fr
+            }
+
+            .controls-row {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body data-theme="light">
+    <header class="nav" role="banner">
+        <div class="brand" aria-hidden>
+            <div class="logo">CQ</div>
+            <h1>ChillQuizList</h1>
+        </div>
+
+        <div class="controls" aria-hidden>
+            <div class="progress-pill" title="Progresso completato">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                    <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round"></path>
+                </svg>
+                <small id="progressPercent">0%</small>
+            </div>
+
+            <button class="icon-btn" id="resetProgress" title="Resetta progressi"
+                aria-label="Resetta tutti i progressi">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                    <path d="M3 3v5h5"></path>
+                </svg>
+            </button>
+
+            <button class="theme-toggle" id="themeBtn" aria-pressed="false" aria-label="Cambia tema">
+                <div class="knob"></div>
+            </button>
+        </div>
+    </header>
+
+    <main class="wrap">
+
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="left">
+                <h2 id="hero-title">Scopri i migliori mini-quiz quotidiani</h2>
+                <p>Badge, progressi, e design pulito. Tocca "Inizia" per saltare ai quiz o esplora le funzionalità
+                    interattive.</p>
+                <div class="cta">
+                    <button class="btn primary" id="quickStart">Inizia</button>
+                    <button class="btn ghost" id="showBadges">I miei badge</button>
+                </div>
+            </div>
+            <div class="right">
+                <div class="badges" aria-live="polite" id="badgesArea">
+                    <!-- dinamico -->
+                </div>
+            </div>
+        </section>
+
+        <section class="grid" aria-label="Categorie di quiz">
+
+            <!-- CATEGORY: Best -->
+            <article id="best" class="category" aria-labelledby="best-title">
+                <h3 id="best-title">Best <span class="muted">— quotidiani e top picks</span></h3>
+                <div class="filters" role="toolbar" aria-label="Filtri livello">
+                    <button class="filter-btn" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="easy">Easy</button>
+                    <button class="filter-btn" data-filter="medium">Medium</button>
+                    <button class="filter-btn" data-filter="hard">Hard</button>
+                    <button class="filter-btn" id="openAllBest">Open All</button>
+                </div>
+
+                <div class="quiz-list" id="best-list">
+                    <!-- cards injected by JS -->
+                </div>
+            </article>
+
+            <!-- CATEGORY: Less Important -->
+            <article id="less-important" class="category" aria-labelledby="less-title">
+                <h3 id="less-title">Less Important <span class="muted">— da tenere d'occhio</span></h3>
+                <div class="filters" role="toolbar">
+                    <button class="filter-btn" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="easy">Easy</button>
+                    <button class="filter-btn" data-filter="medium">Medium</button>
+                    <button class="filter-btn" data-filter="hard">Hard</button>
+                    <button class="filter-btn" id="openAllLess">Open All</button>
+                </div>
+                <div class="quiz-list" id="less-list"></div>
+            </article>
+
+            <!-- CATEGORY: Other -->
+            <article id="other" class="category" aria-labelledby="other-title">
+                <h3 id="other-title">Other <span class="muted">— extra & curiosità</span></h3>
+                <div class="filters" role="toolbar">
+                    <button class="filter-btn" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="easy">Easy</button>
+                    <button class="filter-btn" data-filter="medium">Medium</button>
+                    <button class="filter-btn" data-filter="hard">Hard</button>
+                    <button class="filter-btn" id="openAllOther">Open All</button>
+                </div>
+                <div class="quiz-list" id="other-list"></div>
+            </article>
+
+        </section>
+
+        <!-- Modal detail -->
+        <div id="modalWrap" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+            <div class="modal" role="document">
+                <h3 id="modalTitle">Dettagli Quiz</h3>
+                <p id="modalDesc" class="muted">Descrizione...</p>
+                <div style="margin-top:18px;display:flex;gap:10px;justify-content:flex-end">
+                    <button class="btn ghost" id="closeModal">Chiudi</button>
+                    <button class="btn primary" id="playFromModal">Apri quiz</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="site">ChillQuizList — by Kozak • <small class="muted">Local-first, privacy-friendly</small>
+        </footer>
+
+    </main>
+
+    <script>
+        /* ---------- Data model (puoi aggiornarlo facilmente) ---------- */
+        const DB = {
+            best: [
+                { id: 'quordle-it', title: 'Quordle IT', url: 'https://wordleplay.com/it/quordle', desc: '4 parole al giorno. Sfida la tua mente!', level: 'medium' },
+                { id: 'wordle', title: 'Wordle', url: 'https://pietroppeter.github.io/wordle-it/', desc: 'Il classico Wordle in italiano.', level: 'easy' },
+                { id: 'guess-the-age', title: 'Guess The Age', url: 'https://guesstheage.org/', desc: 'Indovina l\'età dalle foto.', level: 'medium' },
+                { id: 'nerdle', title: 'Nerdle', url: 'https://nerdlegame.com/', desc: 'Matematica e logica in stile Wordle.', level: 'hard' },
+                { id: 'flagle', title: 'Flagle', url: 'https://flagle-game.com/', desc: 'Indovina le bandiere del mondo.', level: 'medium' },
+                { id: 'angle', title: 'Angle', url: 'https://angle.wtf/', desc: 'Gioco visuale basato su angoli e immagini.', level: 'hard' },
+                { id: 'travel-ita', title: 'Travel ITA', url: 'https://travle.earth/ita/', desc: 'Geografia e memoria visiva.', level: 'easy' }
+            ],
+            'less-important': [
+                { id: 'eyespy', title: 'EyeSpy', url: 'https://eyespy.world/home', desc: 'Cerca dettagli nascosti nelle immagini.', level: 'easy' },
+                { id: 'gamedle', title: 'Gamedle', url: 'https://www.gamedle.wtf/?lang=it', desc: 'Indovina giochi e titoli.', level: 'medium' },
+                { id: 'quordle-en', title: 'Quordle EN', url: 'https://www.merriam-webster.com/games/quordle/#/', desc: 'Quordle in inglese.', level: 'medium' },
+                { id: 'songless', title: 'Songless', url: 'https://lessgames.com/songless', desc: 'Riconosci canzoni senza testo.', level: 'hard' },
+                { id: 'rankdle', title: 'Rankdle', url: 'https://rankdle.com/', desc: 'Ordina elementi secondo una logica.', level: 'medium' },
+                { id: 'totoquiz', title: 'TotoQuiz', url: 'https://www.ed0.it/quiz/totoquiz', desc: 'Quiz a tema vario.', level: 'easy' },
+                { id: 'timeguessr', title: 'TimeGuessr', url: 'https://timeguessr.com/roundonedaily', desc: 'Indovina l\'anno di eventi famosi.', level: 'hard' }
+            ],
+            other: [
+                { id: 'ghigliottina', title: 'Parola Chiave', url: 'https://www.ed0.it/quiz/parolachiave/', desc: 'Gioco di parole italiano.', level: 'medium' },
+                { id: 'crononews', title: 'CronoNews', url: 'https://www.ed0.it/quiz/crononews', desc: 'Quiz legato a notizie.', level: 'easy' },
+                { id: 'globle', title: 'Globle', url: 'https://globle-game.com/game', desc: 'Indovina il Paese misterioso.', level: 'medium' },
+                { id: 'numble', title: 'Numble', url: 'https://numble.wtf/', desc: 'Gioco numerico in stile Wordle.', level: 'easy' },
+                { id: 'pokedle', title: 'Pokedle', url: 'https://pokedle.net/', desc: 'Indovina il Pokémon.', level: 'medium' },
+                { id: 'loldle', title: 'Loldle', url: 'https://loldle.net/', desc: 'League of Legends quiz.', level: 'hard' }
+            ]
+        };
+
+        /* ---------- State & persistence ---------- */
+        const STORE_KEY = 'chillquiz:state:v1';
+        const BADGES_KEY = 'chillquiz:badges:v1';
+
+        // Initialize state with error handling
+        let state = {};
+        let badges = [];
+
+        try {
+            state = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+        } catch (e) {
+            console.warn('Error loading state from localStorage:', e);
+            state = {};
+        }
+
+        try {
+            badges = JSON.parse(localStorage.getItem(BADGES_KEY) || '[]');
+        } catch (e) {
+            console.warn('Error loading badges from localStorage:', e);
+            badges = [];
+        }
+
+        // Defaults: mark none completed
+        function isCompleted(id) { return !!state[id]; }
+        function setCompleted(id, v = true) {
+            state[id] = v;
+            try {
+                localStorage.setItem(STORE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.warn('Error saving state to localStorage:', e);
+            }
+            updateUI();
+            maybeAwardBadges();
+        }
+
+        /* ---------- Helper functions ---------- */
+        function generateInitials(title) {
+            // Split by spaces and take first letter of each word (max 2)
+            const words = title.split(' ').filter(word => word.length > 0);
+            if (words.length === 1) {
+                // Single word: take first 2 letters
+                return words[0].substring(0, 2).toUpperCase();
+            } else {
+                // Multiple words: take first letter of first 2 words
+                return words.slice(0, 2).map(word => word[0]).join('').toUpperCase();
+            }
+        }
+
+        function getFaviconUrl(url) {
+            try {
+                const domain = new URL(url).hostname;
+                return `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function createFaviconThumb(item) {
+            const faviconUrl = getFaviconUrl(item.url);
+            const fallbackText = generateInitials(item.title);
+
+            if (faviconUrl) {
+                return `<img src="${faviconUrl}" alt="${item.title} favicon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                        <span class="fallback-text" style="display: none;">${fallbackText}</span>`;
+            } else {
+                return `<span class="fallback-text">${fallbackText}</span>`;
+            }
+        }
+
+        /* ---------- Render functions ---------- */
+        function mkCard(item) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'quiz-card';
+            if (isCompleted(item.id)) wrapper.classList.add('completed');
+            wrapper.setAttribute('tabindex', '0');
+            const isCompletedState = isCompleted(item.id);
+            const toggleBtnClass = isCompletedState ? 'icon-btn completed' : 'icon-btn';
+            wrapper.innerHTML = `
+        <div class="quiz-meta">
+          <div class="quiz-thumb" aria-hidden>${createFaviconThumb(item)}</div>
+          <div>
+            <div class="quiz-title">${item.title}</div>
+            <div class="quiz-sub">${item.desc}</div>
+          </div>
+        </div>
+        <div class="controls-row">
+          <div class="tags"><span class="tag ${item.level}">${item.level}</span></div>
+          <button class="icon-btn" title="Info" data-action="info" data-id="${item.id}" aria-label="Dettagli ${item.title}">ℹ️</button>
+          <button class="icon-btn play" title="Play" data-action="open" data-url="${item.url}" aria-label="Apri ${item.title}">▶</button>
+          <button class="${toggleBtnClass}" title="Completa" data-action="toggle" data-id="${item.id}" aria-label="Segna completato ${item.title}">${isCompletedState ? '✓' : '○'}</button>
+        </div>
+      `;
+            // attach dataset
+            wrapper.dataset.level = item.level;
+            wrapper.dataset.id = item.id;
+            return wrapper;
+        }
+
+        function renderSection(key, container) {
+            if (!container) return;
+            container.innerHTML = '';
+            if (DB[key]) {
+                DB[key].forEach(item => container.appendChild(mkCard(item)));
+            }
+        }
+
+        function updateUI() {
+            // update lists
+            renderSection('best', document.getElementById('best-list'));
+            renderSection('less-important', document.getElementById('less-list'));
+            renderSection('other', document.getElementById('other-list'));
+
+            // progress
+            const total = Object.values(DB).flat().length;
+            const completed = Object.keys(state).filter(k => state[k]).length;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+            const progressEl = document.getElementById('progressPercent');
+            if (progressEl) {
+                progressEl.textContent = `${pct}%`;
+            }
+
+            // update badges area
+            renderBadges();
+        }
+
+        /* ---------- Badges system ---------- */
+        const BADGE_RULES = [
+            { id: 'bronze-5', label: 'Explorer • 5', at: 5 },
+            { id: 'silver-10', label: 'Adept • 10', at: 10 },
+            { id: 'gold-20', label: 'Master • 20', at: 20 }
+        ];
+
+        function maybeAwardBadges() {
+            const count = Object.keys(state).filter(k => state[k]).length;
+            BADGE_RULES.forEach(rule => {
+                if (count >= rule.at && !badges.includes(rule.id)) {
+                    badges.push(rule.id);
+                    try {
+                        localStorage.setItem(BADGES_KEY, JSON.stringify(badges));
+                    } catch (e) {
+                        console.warn('Error saving badges to localStorage:', e);
+                    }
+                    popBadge(rule.label);
+                }
+            });
+        }
+
+        function popBadge(label) {
+            // Create animated popup in center of screen
+            const popup = document.createElement('div');
+            popup.className = 'badge-popup';
+            popup.textContent = `🏅 Badge Sbloccato: ${label}!`;
+            document.body.appendChild(popup);
+
+            // Remove after animation
+            setTimeout(() => popup.remove(), 3200);
+
+            // Also add to badges area with entrance animation
+            const el = document.createElement('div');
+            el.className = 'badge';
+            el.textContent = `🏅 ${label}`;
+            el.style.transform = 'scale(0)';
+            el.style.opacity = '0';
+
+            const badgesArea = document.getElementById('badgesArea');
+            if (badgesArea) {
+                badgesArea.appendChild(el);
+                // Smooth entrance animation
+                setTimeout(() => {
+                    el.style.transform = 'scale(1)';
+                    el.style.opacity = '1';
+                }, 100);
+            }
+        }
+
+        function renderBadges() {
+            const area = document.getElementById('badgesArea');
+            if (!area) return;
+            area.innerHTML = '';
+            badges.forEach(id => {
+                const rule = BADGE_RULES.find(r => r.id === id);
+                if (rule) {
+                    const b = document.createElement('div');
+                    b.className = 'badge';
+                    b.textContent = `🏅 ${rule.label}`;
+                    area.appendChild(b);
+                }
+            });
+        }
+
+        /* ---------- Event delegation for quiz list actions ---------- */
+        document.addEventListener('click', e => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const action = btn.dataset.action;
+            if (action === 'open') {
+                const u = btn.dataset.url;
+                if (u) window.open(u, '_blank');
+            } else if (action === 'toggle') {
+                const id = btn.dataset.id;
+                if (id) setCompleted(id, !isCompleted(id));
+            } else if (action === 'info') {
+                const id = btn.dataset.id;
+                if (id) openModalFor(id);
+            }
+        });
+
+        /* ---------- Modal ---------- */
+        const modalWrap = document.getElementById('modalWrap');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const playFromModal = document.getElementById('playFromModal');
+        let currentModalItem = null;
+
+        function openModalFor(id) {
+            const item = Object.values(DB).flat().find(i => i.id === id);
+            if (!item) return;
+            currentModalItem = item;
+            if (modalTitle) modalTitle.textContent = item.title;
+            if (modalDesc) modalDesc.textContent = item.desc + ' • Difficoltà: ' + item.level;
+            if (modalWrap) {
+                modalWrap.classList.add('open');
+                modalWrap.setAttribute('aria-hidden', 'false');
+            }
+        }
+
+        function closeModal() {
+            if (modalWrap) {
+                modalWrap.classList.remove('open');
+                modalWrap.setAttribute('aria-hidden', 'true');
+            }
+        }
+
+        // Modal event listeners
+        const closeModalBtn = document.getElementById('closeModal');
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', closeModal);
+        }
+
+        if (playFromModal) {
+            playFromModal.addEventListener('click', () => {
+                if (currentModalItem && currentModalItem.url) {
+                    window.open(currentModalItem.url, '_blank');
+                }
+            });
+        }
+
+        // Close modal on backdrop click
+        if (modalWrap) {
+            modalWrap.addEventListener('click', (e) => {
+                if (e.target === modalWrap) {
+                    closeModal();
+                }
+            });
+        }
+
+        /* ---------- Filters & Open All ---------- */
+        function applyFilter(sectionId, level) {
+            const container = document.getElementById(sectionId + '-list');
+            if (!container) return;
+
+            container.querySelectorAll('.quiz-card').forEach(card => {
+                card.style.display = (level === 'all' || card.dataset.level === level) ? '' : 'none';
+            });
+        }
+
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const filter = btn.dataset.filter || 'all';
+                const parent = btn.closest('.category');
+                if (parent) {
+                    applyFilter(parent.id, filter);
+                }
+            });
+        });
+
+        function openAllIn(sectionId) {
+            const container = document.getElementById(sectionId + '-list');
+            if (!container) return;
+
+            const urls = Array.from(container.querySelectorAll('.icon-btn.play')).map(b => b.dataset.url).filter(Boolean);
+            urls.forEach(u => window.open(u, '_blank'));
+        }
+
+        const openAllBest = document.getElementById('openAllBest');
+        const openAllLess = document.getElementById('openAllLess');
+        const openAllOther = document.getElementById('openAllOther');
+
+        if (openAllBest) openAllBest.addEventListener('click', () => openAllIn('best'));
+        if (openAllLess) openAllLess.addEventListener('click', () => openAllIn('less-important'));
+        if (openAllOther) openAllOther.addEventListener('click', () => openAllIn('other'));
+
+        /* ---------- Removed navbar scroll functionality ---------- */
+
+        /* ---------- Theme toggle with persistence ---------- */
+        const themeBtn = document.getElementById('themeBtn');
+        let userTheme = 'light';
+
+        try {
+            userTheme = localStorage.getItem('chillquiz:theme') || 'light';
+        } catch (e) {
+            console.warn('Error loading theme from localStorage:', e);
+        }
+
+        document.body.setAttribute('data-theme', userTheme);
+        document.documentElement.setAttribute('data-theme', userTheme);
+
+        if (themeBtn) {
+            themeBtn.setAttribute('aria-pressed', (userTheme === 'dark').toString());
+
+            themeBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                const newTheme = isDark ? 'light' : 'dark';
+
+                document.documentElement.setAttribute('data-theme', newTheme);
+                document.body.setAttribute('data-theme', newTheme);
+
+                try {
+                    localStorage.setItem('chillquiz:theme', newTheme);
+                } catch (e) {
+                    console.warn('Error saving theme to localStorage:', e);
+                }
+
+                themeBtn.setAttribute('aria-pressed', (!isDark).toString());
+            });
+        }
+
+        /* ---------- Quick start & badges drawer ---------- */
+        const quickStartBtn = document.getElementById('quickStart');
+        const showBadgesBtn = document.getElementById('showBadges');
+
+        if (quickStartBtn) {
+            quickStartBtn.addEventListener('click', () => {
+                const bestSection = document.getElementById('best');
+                if (bestSection) {
+                    bestSection.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }
+
+        if (showBadgesBtn) {
+            showBadgesBtn.addEventListener('click', () => {
+                const badgeList = badges.length ?
+                    badges.map(id => {
+                        const rule = BADGE_RULES.find(r => r.id === id);
+                        return rule ? rule.label : id;
+                    }).join(', ') :
+                    'Nessun badge ancora. Completa alcuni quiz!';
+                alert('Badges: ' + badgeList);
+            });
+        }
+
+        // Reset progress button
+        const resetBtn = document.getElementById('resetProgress');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                if (confirm('Sei sicuro di voler resettare tutti i progressi e i badge? Questa azione non può essere annullata.')) {
+                    // Clear state and badges
+                    try {
+                        localStorage.removeItem(STORE_KEY);
+                        localStorage.removeItem(BADGES_KEY);
+                    } catch (e) {
+                        console.warn('Error clearing localStorage:', e);
+                    }
+
+                    // Reset in-memory state
+                    Object.keys(state).forEach(key => delete state[key]);
+                    badges.length = 0;
+
+                    // Update UI
+                    updateUI();
+
+                    alert('Progressi resettati con successo!');
+                }
+            });
+        }
+
+        /* ---------- Setup initial render ---------- */
+        function initialize() {
+            renderBadges();
+            updateUI();
+
+            // attach keyboard support: Enter on card opens modal
+            document.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && document.activeElement && document.activeElement.classList.contains('quiz-card')) {
+                    const id = document.activeElement.dataset.id;
+                    if (id) openModalFor(id);
+                }
+
+                // Accessibility: close modal on ESC
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            // ensure badges from previous sessions are shown in badges area
+            badges.forEach(id => {
+                const rule = BADGE_RULES.find(r => r.id === id);
+                if (rule) {
+                    const b = document.createElement('div');
+                    b.className = 'badge';
+                    b.textContent = `🏅 ${rule.label}`;
+                    const badgesArea = document.getElementById('badgesArea');
+                    if (badgesArea) {
+                        badgesArea.appendChild(b);
+                    }
+                }
+            });
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initialize);
+        } else {
+            initialize();
+        }
+
+    </script>
+
+</body>
+
+</html>
